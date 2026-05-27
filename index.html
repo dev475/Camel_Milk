@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Camel Milk Yogurt Research Tools</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Courier+Prime:wght@400;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Lato',sans-serif;background:#f0f4f8;color:#1a1a2e;}
+  /* NAV */
+  .nav{display:flex;background:linear-gradient(135deg,#1a5276,#148f77);padding:0;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.2);position:sticky;top:0;z-index:999;}
+  .nav-brand{padding:14px 24px;color:#fff;font-weight:900;font-size:15px;border-right:1px solid rgba(255,255,255,0.2);white-space:nowrap;}
+  .nav-brand span{color:#d4ac0d;}
+  .nav-tabs{display:flex;flex:1;overflow-x:auto;}
+  .nav-tab{padding:14px 22px;color:rgba(255,255,255,0.75);font-weight:700;font-size:13px;cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;}
+  .nav-tab:hover{color:#fff;background:rgba(255,255,255,0.08);}
+  .nav-tab.active{color:#d4ac0d;border-bottom-color:#d4ac0d;background:rgba(255,255,255,0.1);}
+  /* SECTIONS */
+  .section{display:none;padding:24px;max-width:1300px;margin:0 auto;}
+  .section.active{display:block;}
+  /* CARDS */
+  .card{background:#fff;border-radius:16px;padding:22px;box-shadow:0 4px 18px rgba(0,0,0,0.08);margin-bottom:18px;}
+  .card-title{font-size:14px;font-weight:800;margin-bottom:14px;letter-spacing:0.3px;}
+  /* HEADER BANNER */
+  .banner{border-radius:16px;padding:22px 28px;margin-bottom:22px;color:#fff;box-shadow:0 6px 24px rgba(0,0,0,0.2);}
+  .banner-sub{font-size:11px;letter-spacing:3px;opacity:0.8;margin-bottom:4px;font-weight:700;}
+  .banner-title{font-size:22px;font-weight:900;margin-bottom:4px;}
+  .banner-desc{font-size:13px;opacity:0.85;}
+  /* GRID */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+  .grid-master{display:grid;grid-template-columns:300px 1fr;gap:18px;}
+  @media(max-width:900px){.grid-2,.grid-master{grid-template-columns:1fr;}.grid-3{grid-template-columns:1fr 1fr;}.grid-4{grid-template-columns:1fr 1fr;}}
+  /* SLIDERS */
+  .slider-row{margin-bottom:16px;}
+  .slider-header{display:flex;justify-content:space-between;margin-bottom:6px;}
+  .slider-label{font-size:12px;font-weight:700;color:#444;}
+  .slider-val{font-size:13px;font-weight:800;font-family:'Courier Prime',monospace;padding:1px 10px;border-radius:6px;border:1.5px solid currentColor;}
+  input[type=range]{width:100%;height:6px;cursor:pointer;border-radius:3px;}
+  .slider-minmax{display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-top:2px;}
+  /* KPI */
+  .kpi{border-radius:14px;padding:16px 18px;border-left:4px solid currentColor;}
+  .kpi-icon{font-size:22px;}
+  .kpi-val{font-size:20px;font-weight:900;margin-top:4px;}
+  .kpi-label{font-size:11px;color:#888;margin-top:2px;}
+  /* GAUGE */
+  .gauge{background:#fff;border-radius:12px;padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1px solid #eee;margin-bottom:12px;}
+  .gauge-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .gauge-name{font-size:11px;font-weight:700;color:#555;}
+  .gauge-val{font-size:15px;font-weight:900;font-family:'Courier Prime',monospace;}
+  .gauge-d{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+  .gauge-bar-bg{height:12px;background:#f0f0f0;border-radius:6px;overflow:hidden;position:relative;}
+  .gauge-ideal{position:absolute;height:100%;background:#d5f5e3;z-index:1;}
+  .gauge-fill{position:absolute;left:0;height:100%;border-radius:6px;z-index:2;transition:width 0.4s;}
+  .gauge-hint{font-size:9px;color:#aaa;margin-top:3px;}
+  /* TABS */
+  .tab-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .tab-btn{padding:8px 18px;border-radius:25px;border:none;cursor:pointer;font-weight:700;font-size:11px;transition:all 0.2s;}
+  /* TABLES */
+  table{width:100%;border-collapse:collapse;font-size:11px;}
+  th{padding:9px 12px;text-align:left;font-weight:700;}
+  td{padding:8px 12px;border-bottom:1px solid #f0f0f0;}
+  tr:nth-child(even) td{background:#fafafa;}
+  /* FLOW */
+  .flow-box{border-radius:12px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.1);}
+  .flow-head{padding:10px 16px;color:#fff;font-weight:800;font-size:12px;}
+  .flow-body{padding:12px 16px;}
+  .flow-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #eee;font-size:11px;}
+  .flow-row:last-child{border:none;}
+  .flow-key{color:#666;}
+  /* DESIRABILITY */
+  .desirability-box{border-radius:12px;padding:16px;border:2px solid;}
+  /* EQUATION */
+  .equation{background:#f0faf4;border-radius:10px;padding:14px;font-family:'Courier Prime',monospace;font-size:11px;line-height:1.9;}
+  /* BADGES */
+  .badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+  /* CHARTS */
+  .chart-wrap{position:relative;width:100%;}
+  /* ARRHENIUS */
+  .stat-box{background:#f8f9fa;border-radius:10px;padding:10px 12px;text-align:center;}
+  .finding-box{border-radius:10px;padding:14px;font-size:11px;margin-top:14px;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">🐪 <span>Camel Milk</span> Research Tools</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('rsm')">📊 RSM Optimization</button>
+    <button class="nav-tab" onclick="showSection('mass')">⚖️ Mass Balance</button>
+    <button class="nav-tab" onclick="showSection('shelf')">📅 Shelf Life Prediction</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 1: RSM                                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="rsm" class="section active">
+  <div class="banner" style="background:linear-gradient(135deg,#1a5276,#148f77);">
+    <div class="banner-sub">RESEARCH TOOL · RSM SIMULATION</div>
+    <div class="banner-title">Response Surface Methodology Optimizer</div>
+    <div class="banner-desc">Camel Milk Yogurt Enriched with Pearl Millet · Box-Behnken Design · Move sliders to update all results</div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" id="rsm-tab-dashboard" onclick="rsmTab('dashboard')" style="background:#1a5276;color:#fff;">Dashboard</button>
+    <button class="tab-btn" id="rsm-tab-surface" onclick="rsmTab('surface')" style="background:#fff;color:#555;">Surface Plots</button>
+    <button class="tab-btn" id="rsm-tab-bbd" onclick="rsmTab('bbd')" style="background:#fff;color:#555;">BBD Table</button>
+    <button class="tab-btn" id="rsm-tab-coeff" onclick="rsmTab('coeff')" style="background:#fff;color:#555;">Coefficients</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="rsm-dashboard">
+    <div class="grid-master">
+      <!-- Controls -->
+      <div>
+        <div class="card">
+          <div class="card-title" style="color:#1a5276;">⚙ PROCESS VARIABLES</div>
+          <div style="background:#f8f9fa;border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:11px;color:#666;">
+            💡 Move sliders to see how each variable affects all 5 quality responses in real-time
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Pearl Millet Level (X₁)</span>
+              <span class="slider-val" id="rsm-millet-val" style="color:#148f77;border-color:#148f77;">9%</span>
+            </div>
+            <input type="range" min="0" max="15" step="0.5" value="9" id="rsm-millet" oninput="rsmUpdate()" style="accent-color:#148f77;">
+            <div class="slider-minmax"><span>0%</span><span>15%</span></div>
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Starter Culture (X₂)</span>
+              <span class="slider-val" id="rsm-starter-val" style="color:#1a5276;border-color:#1a5276;">2.5%</span>
+            </div>
+            <input type="range" min="1" max="4" step="0.1" value="2.5" id="rsm-starter" oninput="rsmUpdate()" style="accent-color:#1a5276;">
+            <div class="slider-minmax"><span>1%</span><span>4%</span></div>
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Incubation Time (X₃)</span>
+              <span class="slider-val" id="rsm-time-val" style="color:#d35400;border-color:#d35400;">6 h</span>
+            </div>
+            <input type="range" min="4" max="8" step="0.5" value="6" id="rsm-time" oninput="rsmUpdate()" style="accent-color:#d35400;">
+            <div class="slider-minmax"><span>4h</span><span>8h</span></div>
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Temperature (Fixed)</span>
+              <span class="slider-val" id="rsm-temp-val" style="color:#7d3c98;border-color:#7d3c98;">42°C</span>
+            </div>
+            <input type="range" min="37" max="45" step="1" value="42" id="rsm-temp" oninput="rsmUpdate()" style="accent-color:#7d3c98;">
+            <div class="slider-minmax"><span>37°C</span><span>45°C</span></div>
+          </div>
+
+          <!-- Desirability -->
+          <div class="desirability-box" id="rsm-desirability-box" style="margin-top:18px;border-color:#1a7a4a;background:#f0faf4;">
+            <div style="font-size:11px;font-weight:700;color:#1a7a4a;margin-bottom:6px;">OVERALL DESIRABILITY</div>
+            <div style="font-size:42px;font-weight:900;color:#1a7a4a;line-height:1;" id="rsm-des-pct">89%</div>
+            <div style="height:8px;background:#ddd;border-radius:4px;margin-top:10px;overflow:hidden;">
+              <div id="rsm-des-bar" style="width:89%;height:100%;background:#1a7a4a;border-radius:4px;transition:width 0.4s;"></div>
+            </div>
+            <div style="font-size:10px;font-weight:600;margin-top:6px;" id="rsm-des-label">✓ Excellent — Near Optimal Conditions</div>
+          </div>
+
+          <!-- Conditions summary -->
+          <div style="margin-top:14px;background:#f8f9fa;border-radius:10px;padding:12px;font-size:11px;">
+            <div style="font-weight:700;color:#333;margin-bottom:8px;">Current Coded Values:</div>
+            <div style="font-family:'Courier Prime',monospace;color:#555;line-height:2.0;" id="rsm-coded-vals">
+              X₁ = +0.20 (Millet)<br>X₂ = 0.00 (Starter)<br>X₃ = 0.00 (Time)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gauges -->
+      <div>
+        <div id="rsm-gauges"></div>
+
+        <!-- Equation -->
+        <div class="card">
+          <div class="card-title" style="color:#1a5276;">📐 RSM POLYNOMIAL EQUATION (pH Response)</div>
+          <div class="equation">
+            pH = 4.520 − 0.062X₁ − 0.018X₂ − 0.031X₃<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ 0.004X₁² + 0.006X₂² + 0.003X₃²<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;− 0.002X₁X₂ + 0.001X₁X₃ − 0.001X₂X₃<br><br>
+            <span style="color:#888;">where X₁=Millet%, X₂=Starter%, X₃=Time(h)</span><br>
+            <span style="color:#888;">Coded: X₁∈[−1,+1], center=7.5%, step=7.5%</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+            <span class="badge" style="background:#1a5276;color:#fff;">R² = 0.9823</span>
+            <span class="badge" style="background:#148f77;color:#fff;">Adj-R² = 0.9612</span>
+            <span class="badge" style="background:#d35400;color:#fff;">Lack of Fit p=0.087 NS</span>
+            <span class="badge" style="background:#7d3c98;color:#fff;">Model F = 46.82</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SURFACE PLOTS -->
+  <div id="rsm-surface" style="display:none;">
+    <div class="grid-2">
+      <div class="card"><div class="card-title" style="color:#1a7a4a;">pH vs. Millet Level (%)</div><div class="chart-wrap" style="height:220px;"><canvas id="c-ph-millet"></canvas></div></div>
+      <div class="card"><div class="card-title" style="color:#c0392b;">Acidity vs. Millet Level (%)</div><div class="chart-wrap" style="height:220px;"><canvas id="c-acid-millet"></canvas></div></div>
+      <div class="card"><div class="card-title" style="color:#d35400;">Sensory Score vs. Millet Level (%)</div><div class="chart-wrap" style="height:220px;"><canvas id="c-sens-millet"></canvas></div></div>
+      <div class="card"><div class="card-title" style="color:#7d3c98;">DPPH Inhibition vs. Millet Level (%)</div><div class="chart-wrap" style="height:220px;"><canvas id="c-dpph-millet"></canvas></div></div>
+      <div class="card"><div class="card-title" style="color:#2471a3;">Syneresis vs. Starter Culture (%)</div><div class="chart-wrap" style="height:220px;"><canvas id="c-syne-starter"></canvas></div></div>
+      <div class="card"><div class="card-title" style="color:#d35400;">Sensory Score vs. Starter Culture (%)</div><div class="chart-wrap" style="height:220px;"><canvas id="c-sens-starter"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- BBD TABLE -->
+  <div id="rsm-bbd" style="display:none;">
+    <div class="card">
+      <div class="card-title" style="color:#1a5276;">Box-Behnken Design — Experimental Run Table</div>
+      <p style="font-size:11px;color:#888;margin-bottom:16px;">3 factors × 3 levels = 15 runs (including center points). Predicted values update with sliders.</p>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead style="background:#1a5276;color:#fff;">
+            <tr><th>Run</th><th>X₁(coded)</th><th>X₂(coded)</th><th>X₃(coded)</th><th>Millet(%)</th><th>Starter(%)</th><th>Time(h)</th><th>pH (pred.)</th><th>Sensory (pred.)</th></tr>
+          </thead>
+          <tbody id="rsm-bbd-body"></tbody>
+        </table>
+      </div>
+      <p style="font-size:10px;color:#1a7a4a;margin-top:8px;font-weight:700;">★ Green row = Your current slider conditions</p>
+    </div>
+  </div>
+
+  <!-- COEFFICIENTS -->
+  <div id="rsm-coeff" style="display:none;">
+    <div class="grid-2" id="rsm-coeff-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 2: MASS BALANCE                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="mass" class="section">
+  <div class="banner" style="background:linear-gradient(135deg,#1a5276,#ca6f1e);">
+    <div class="banner-sub">RESEARCH TOOL · PROCESS ENGINEERING</div>
+    <div class="banner-title">Mass Balance & Closed-Loop System Model</div>
+    <div class="banner-desc">Camel Milk Yogurt Production · Byproduct Valorization · Sustainability Analysis · Change any slider to update entire model</div>
+  </div>
+
+  <!-- Inputs grid -->
+  <div class="card">
+    <div class="card-title" style="color:#ca6f1e;">⚙ EDITABLE PROCESS PARAMETERS</div>
+    <div class="grid-4" id="mass-sliders"></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid-4" id="mass-kpis" style="margin-bottom:18px;"></div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="mass-tab-flow" onclick="massTab('flow')" style="background:#1a5276;color:#fff;">Flow Diagram</button>
+    <button class="tab-btn" id="mass-tab-table" onclick="massTab('table')" style="background:#fff;color:#555;">Mass Balance Table</button>
+    <button class="tab-btn" id="mass-tab-econ" onclick="massTab('econ')" style="background:#fff;color:#555;">Economics</button>
+    <button class="tab-btn" id="mass-tab-sus" onclick="massTab('sus')" style="background:#fff;color:#555;">Sustainability</button>
+  </div>
+
+  <div id="mass-flow">
+    <div class="grid-2" style="margin-bottom:16px;" id="mass-flow-boxes"></div>
+    <div class="card" id="mass-val-boxes">
+      <div class="card-title" style="color:#ca6f1e;">♻ CLOSED-LOOP VALORIZATION OUTPUTS</div>
+      <div class="grid-3" id="mass-val-grid"></div>
+    </div>
+    <div class="card" style="background:#f0faf4;border:2px solid #148f77;margin-top:16px;">
+      <div class="card-title" style="color:#148f77;">✓ MASS BALANCE VERIFICATION</div>
+      <div class="grid-3" id="mass-verify"></div>
+    </div>
+  </div>
+
+  <div id="mass-table" style="display:none;">
+    <div class="card">
+      <div class="card-title" style="color:#333;" id="mass-table-title">📋 Detailed Mass Balance Table</div>
+      <div style="overflow-x:auto;"><table><thead style="background:#1a5276;color:#fff;"><tr><th>Stream</th><th>Description</th><th>Quantity</th><th>Unit</th><th>Destination</th></tr></thead><tbody id="mass-table-body"></tbody></table></div>
+    </div>
+  </div>
+
+  <div id="mass-econ" style="display:none;">
+    <div class="grid-2">
+      <div class="card"><div class="card-title" style="color:#1a7a4a;">Revenue Comparison (₹)</div><canvas id="mass-revenue-chart" height="260"></canvas></div>
+      <div class="card" id="mass-econ-detail"><div class="card-title" style="color:#1a5276;">💰 Economic Summary</div></div>
+    </div>
+  </div>
+
+  <div id="mass-sus" style="display:none;">
+    <div class="grid-2" id="mass-sus-kpis" style="margin-bottom:18px;"></div>
+    <div class="card"><div class="card-title" style="color:#333;">🌍 Linear vs. Closed-Loop Comparison</div><canvas id="mass-sus-chart" height="200"></canvas></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SECTION 3: SHELF LIFE                                  -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="shelf" class="section">
+  <div class="banner" style="background:linear-gradient(135deg,#2c3e50,#7d3c98);">
+    <div class="banner-sub">RESEARCH TOOL · PREDICTIVE MODELING</div>
+    <div class="banner-title">Shelf-Life Prediction Model</div>
+    <div class="banner-desc">Arrhenius Kinetics · Camel Milk Yogurt + Pearl Millet Enrichment · Multi-Temperature Analysis</div>
+  </div>
+
+  <div class="grid-master">
+    <!-- Left Controls -->
+    <div>
+      <div class="card">
+        <div class="card-title" style="color:#2c3e50;">🌡 STORAGE TEMPERATURES</div>
+        <div id="shelf-temp-sliders"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:#7d3c98;">⚡ ACTIVATION ENERGIES (Eₐ J/mol)</div>
+        <p style="font-size:10px;color:#aaa;margin-bottom:10px;">Based on Labuza (1984), literature values</p>
+        <div id="shelf-ea-sliders"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:#148f77;">🌾 MILLET ENRICHMENT EFFECT</div>
+        <p style="font-size:10px;color:#aaa;margin-bottom:10px;">Shelf-life extension from antimicrobial phenolics</p>
+        <div class="slider-row">
+          <div class="slider-header">
+            <span class="slider-label">Extension Factor</span>
+            <span class="slider-val" id="shelf-millet-val" style="color:#148f77;border-color:#148f77;">1.18×</span>
+          </div>
+          <input type="range" min="1.0" max="2.0" step="0.01" value="1.18" id="shelf-millet" oninput="shelfUpdate()" style="accent-color:#148f77;">
+          <div class="slider-minmax"><span>1.0×</span><span>2.0×</span></div>
+        </div>
+        <div style="background:#d5f5e3;border-radius:8px;padding:8px 10px;font-size:10px;color:#1a7a4a;" id="shelf-millet-desc">
+          Pearl millet extends shelf life by 18% compared to plain yogurt
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div>
+      <!-- Response buttons -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="shelf-resp-btns"></div>
+
+      <!-- Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" id="shelf-tab-deg" onclick="shelfTab('deg')" style="background:#2c3e50;color:#fff;">DegradatioCurves</button>
+        <button class="tab-btn" id="shelf-tab-table" onclick="shelfTab('table')" style="background:#fff;color:#555;">Shelf Life Table</button>
+        <button class="tab-btn" id="shelf-tab-arr" onclick="shelfTab('arr')" style="background:#fff;color:#555;">Arrhenius Plot</button>
+        <button class="tab-btn" id="shelf-tab-kin" onclick="shelfTab('kin')" style="background:#fff;color:#555;">Kinetic Parameters</button>
+      </div>
+
+      <div id="shelf-deg">
+        <div class="card">
+          <div class="card-title" id="shelf-deg-title" style="color:#1a7a4a;">pH Drop — Quality Degradation Over Time</div>
+          <p style="font-size:10px;color:#888;margin-bottom:4px;">Solid lines = Plain camel milk yogurt · Dashed lines = + Pearl millet (9%)</p>
+          <p style="font-size:10px;color:#c0392b;font-weight:700;margin-bottom:14px;" id="shelf-deg-criterion">Failure: pH &lt; 4.0</p>
+          <canvas id="shelf-deg-chart" height="300"></canvas>
+          <div class="grid-4" style="margin-top:16px;" id="shelf-deg-cards"></div>
+        </div>
+      </div>
+
+      <div id="shelf-table" style="display:none;">
+        <div class="card">
+          <div class="card-title" style="color:#333;">Predicted Shelf-Life Table (days)</div>
+          <p style="font-size:10px;color:#aaa;margin-bottom:14px;">Arrhenius kinetics · First-order degradation · Millet factor = <span id="shelf-table-factor">1.18</span>×</p>
+          <div style="overflow-x:auto;"><table id="shelf-sl-table"></table></div>
+          <div class="finding-box" style="background:#d5f5e3;color:#1a7a4a;" id="shelf-finding"></div>
+        </div>
+      </div>
+
+      <div id="shelf-arr" style="display:none;">
+        <div class="card">
+          <div class="card-title" id="shelf-arr-title" style="color:#7d3c98;">Arrhenius Plot — pH Drop</div>
+          <div class="equation" id="shelf-arr-eq" style="margin-bottom:14px;">ln(k) = ln(A) − Eₐ/(R·T)</div>
+          <canvas id="shelf-arr-chart" height="280"></canvas>
+          <div class="grid-4" style="margin-top:14px;" id="shelf-arr-cards"></div>
+        </div>
+      </div>
+
+      <div id="shelf-kin" style="display:none;">
+        <div class="grid-2" id="shelf-kin-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:18px;font-size:10px;color:#aaa;background:#fff;margin-top:20px;">
+  Camel Milk Yogurt Research Tools · RSM Simulation · Mass Balance · Shelf-Life Prediction · For Academic Research Use
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const fmt = (n,d=2) => Number(n).toFixed(d);
+const chartInstances = {};
+
+function destroyChart(id){
+  if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}
+}
+
+function showSection(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  $(name).classList.add('active');
+  event.target.classList.add('active');
+  if(name==='rsm') rsmUpdate();
+  if(name==='mass') massUpdate();
+  if(name==='shelf') shelfUpdate();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RSM TOOL
+// ═══════════════════════════════════════════════════════════════
+const RSM_RESP = {
+  ph:{label:'pH',unit:'',color:'#1a7a4a',b0:4.52,b1:-0.062,b2:-0.018,b3:-0.031,b11:0.004,b22:0.006,b33:0.003,b12:-0.002,b13:0.001,b23:-0.001,idealMin:4.2,idealMax:4.5,ideal:'4.2–4.5',gaugeMin:3.5,gaugeMax:5.0},
+  acidity:{label:'Acidity (%LA)',unit:'%LA',color:'#c0392b',b0:0.82,b1:0.028,b2:0.042,b3:0.035,b11:-0.002,b22:-0.003,b33:-0.002,b12:0.001,b13:0.002,b23:0.001,idealMin:0.85,idealMax:1.10,ideal:'0.85–1.10',gaugeMin:0,gaugeMax:1.5},
+  syneresis:{label:'Syneresis (%)',unit:'%',color:'#2471a3',b0:38.2,b1:-1.42,b2:-0.85,b3:-0.62,b11:0.08,b22:0.12,b33:0.05,b12:-0.04,b13:-0.02,b23:-0.03,idealMin:0,idealMax:28,ideal:'< 28%',gaugeMin:0,gaugeMax:60},
+  sensory:{label:'Sensory (/9)',unit:'/9',color:'#d35400',b0:7.0,b1:0.18,b2:0.12,b3:0.08,b11:-0.022,b22:-0.018,b33:-0.012,b12:0.005,b13:0.003,b23:0.004,idealMin:7.5,idealMax:9,ideal:'> 7.5',gaugeMin:0,gaugeMax:9},
+  dpph:{label:'DPPH Inhibition (%)',unit:'%',color:'#7d3c98',b0:22.4,b1:2.48,b2:0.62,b3:0.38,b11:-0.12,b22:-0.08,b33:-0.05,b12:0.04,b13:0.02,b23:0.01,idealMin:35,idealMax:100,ideal:'> 35%',gaugeMin:0,gaugeMax:70},
+};
+
+function rsmCalc(resp,x1,x2,x3){
+  const r=RSM_RESP[resp];
+  const cx1=(x1-7.5)/7.5,cx2=(x2-2.5)/1.5,cx3=(x3-6)/2;
+  return r.b0+r.b1*cx1+r.b2*cx2+r.b3*cx3+r.b11*cx1*cx1+r.b22*cx2*cx2+r.b33*cx3*cx3+r.b12*cx1*cx2+r.b13*cx1*cx3+r.b23*cx2*cx3;
+}
+
+function rsmDes(resp,val){
+  const r=RSM_RESP[resp];
+  if(resp==='syneresis'){if(val<=r.idealMax)return 1;if(val>=r.idealMax+15)return 0;return 1-(val-r.idealMax)/15;}
+  if(val>=r.idealMin&&val<=r.idealMax)return 1;
+  if(val<r.idealMin)return Math.max(0,1-(r.idealMin-val)/r.idealMin);
+  return Math.max(0,1-(val-r.idealMax)/r.idealMax);
+}
+
+let rsmSurfaceCharts={};
+function rsmUpdate(){
+  const m=parseFloat($('rsm-millet').value);
+  const s=parseFloat($('rsm-starter').value);
+  const t=parseFloat($('rsm-time').value);
+  const temp=parseFloat($('rsm-temp').value);
+  $('rsm-millet-val').textContent=m+'%';
+  $('rsm-starter-val').textContent=s+'%';
+  $('rsm-time-val').textContent=t+' h';
+  $('rsm-temp-val').textContent=temp+'°C';
+
+  // Coded
+  const cx1=fmt((m-7.5)/7.5,2),cx2=fmt((s-2.5)/1.5,2),cx3=fmt((t-6)/2,2);
+  $('rsm-coded-vals').innerHTML=`X₁ = ${cx1} (Millet)<br>X₂ = ${cx2} (Starter)<br>X₃ = ${cx3} (Time)`;
+
+  // Results
+  const results={};
+  let totalD=0;
+  Object.keys(RSM_RESP).forEach(k=>{results[k]=rsmCalc(k,m,s,t);totalD+=rsmDes(k,results[k]);});
+  const od=totalD/5,odPct=Math.round(od*100);
+
+  // Desirability
+  const dc=odPct>=80?'#1a7a4a':odPct>=60?'#f39c12':'#c0392b';
+  const db=$('rsm-desirability-box');
+  db.style.borderColor=dc;db.style.background=dc+'18';
+  $('rsm-des-pct').textContent=odPct+'%';$('rsm-des-pct').style.color=dc;
+  $('rsm-des-bar').style.width=odPct+'%';$('rsm-des-bar').style.background=dc;
+  $('rsm-des-label').style.color=dc;
+  $('rsm-des-label').textContent=odPct>=80?'✓ Excellent — Near Optimal Conditions':odPct>=60?'⚠ Acceptable — Can Be Improved':'✗ Poor — Adjust Variables';
+
+  // Gauges
+  let gHtml='';
+  Object.entries(RSM_RESP).forEach(([k,r])=>{
+    const val=results[k],d=rsmDes(k,val);
+    const dc2=d>=0.8?'#1a7a4a':d>=0.5?'#f39c12':'#c0392b';
+    const pct=Math.min(100,Math.max(0,((val-r.gaugeMin)/(r.gaugeMax-r.gaugeMin))*100));
+    const idealSt=Math.max(0,((r.idealMin-r.gaugeMin)/(r.gaugeMax-r.gaugeMin))*100);
+    const idealW=((r.idealMax-r.idealMin)/(r.gaugeMax-r.gaugeMin))*100;
+    gHtml+=`<div class="gauge">
+      <div class="gauge-header">
+        <span class="gauge-name">${r.label}</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="gauge-val" style="color:${r.color}">${fmt(val,3)}<span style="font-size:9px;">${r.unit}</span></span>
+          <span class="gauge-d" style="color:${dc2};background:${dc2}18;">D=${fmt(d,2)}</span>
+        </div>
+      </div>
+      <div class="gauge-bar-bg">
+        <div class="gauge-ideal" style="left:${idealSt}%;width:${Math.min(idealW,100-idealSt)}%;"></div>
+        <div class="gauge-fill" style="width:${pct}%;background:${r.color};"></div>
+      </div>
+      <div class="gauge-hint">Ideal: ${r.ideal} <span style="color:#1a7a4a;">■ green zone</span></div>
+    </div>`;
+  });
+  $('rsm-gauges').innerHTML=gHtml;
+
+  // BBD table
+  const bbdRuns=[
+    {r:1,x1:-1,x2:-1,x3:0,m:0,s:1.0,t:6},{r:2,x1:1,x2:-1,x3:0,m:15,s:1.0,t:6},
+    {r:3,x1:-1,x2:1,x3:0,m:0,s:4.0,t:6},{r:4,x1:1,x2:1,x3:0,m:15,s:4.0,t:6},
+    {r:5,x1:-1,x2:0,x3:-1,m:0,s:2.5,t:4},{r:6,x1:1,x2:0,x3:1,m:15,s:2.5,t:8},
+    {r:7,x1:0,x2:-1,x3:-1,m:7.5,s:1.0,t:4},{r:8,x1:0,x2:1,x3:1,m:7.5,s:4.0,t:8},
+    {r:9,x1:0,x2:0,x3:0,m:7.5,s:2.5,t:6},{r:10,x1:0,x2:0,x3:0,m:7.5,s:2.5,t:6},{r:11,x1:0,x2:0,x3:0,m:7.5,s:2.5,t:6},
+  ];
+  let bbdHtml='';
+  bbdRuns.forEach(row=>{
+    const ph=fmt(rsmCalc('ph',row.m,row.s,row.t),3);
+    const se=fmt(rsmCalc('sensory',row.m,row.s,row.t),2);
+    bbdHtml+=`<tr><td>${row.r}</td><td>${row.x1}</td><td>${row.x2}</td><td>${row.x3}</td><td>${row.m}</td><td>${row.s}</td><td>${row.t}</td><td style="color:#1a7a4a;font-weight:700;">${ph}</td><td style="color:#1a7a4a;font-weight:700;">${se}</td></tr>`;
+  });
+  bbdHtml+=`<tr style="background:#d5f5e3;font-weight:800;"><td>★</td><td>—</td><td>—</td><td>—</td><td>${m}</td><td>${s}</td><td>${t}</td><td style="color:#1a5276;">${fmt(results.ph,3)}</td><td style="color:#1a5276;">${fmt(results.sensory,2)}</td></tr>`;
+  $('rsm-bbd-body').innerHTML=bbdHtml;
+
+  // Surface charts
+  if($('rsm-surface').style.display!=='none') rsmDrawSurface(s,t,m,results);
+
+  // Coefficients
+  if($('rsm-coeff').style.display!=='none') rsmDrawCoeff();
+}
+
+function rsmDrawSurface(s,t,m,results){
+  const milletX=Array.from({length:16},(_,i)=>i);
+  const starterX=[];for(let x=1.0;x<=4.0;x+=0.2)starterX.push(+x.toFixed(1));
+  const cfgs=[
+    {id:'c-ph-millet',resp:'ph',xArr:milletX,xParam:'millet',fixed:{s,t},color:'#1a7a4a'},
+    {id:'c-acid-millet',resp:'acidity',xArr:milletX,xParam:'millet',fixed:{s,t},color:'#c0392b'},
+    {id:'c-sens-millet',resp:'sensory',xArr:milletX,xParam:'millet',fixed:{s,t},color:'#d35400'},
+    {id:'c-dpph-millet',resp:'dpph',xArr:milletX,xParam:'millet',fixed:{s,t},color:'#7d3c98'},
+    {id:'c-syne-starter',resp:'syneresis',xArr:starterX,xParam:'starter',fixed:{m,t},color:'#2471a3'},
+    {id:'c-sens-starter',resp:'sensory',xArr:starterX,xParam:'starter',fixed:{m,t},color:'#d35400'},
+  ];
+  cfgs.forEach(cfg=>{
+    destroyChart(cfg.id);
+    const data=cfg.xArr.map(x=>{
+      if(cfg.xParam==='millet')return rsmCalc(cfg.resp,x,cfg.fixed.s,cfg.fixed.t);
+      return rsmCalc(cfg.resp,cfg.fixed.m,x,cfg.fixed.t);
+    });
+    const ctx=$(cfg.id).getContext('2d');
+    chartInstances[cfg.id]=new Chart(ctx,{type:'line',data:{labels:cfg.xArr,datasets:[{label:RSM_RESP[cfg.resp].label,data,borderColor:cfg.color,borderWidth:2.5,fill:false,tension:0.4,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:cfg.xParam==='millet'?'Millet Level (%)':'Starter Culture (%)'}},y:{title:{display:true,text:RSM_RESP[cfg.resp].label}}}}});
+  });
+}
+
+function rsmDrawCoeff(){
+  let html='';
+  Object.entries(RSM_RESP).forEach(([k,r])=>{
+    const terms=[['Intercept (β₀)',r.b0,''],['X₁ - Millet (β₁)',r.b1,r.b1>0?'↑ Increases':'↓ Decreases'],['X₂ - Starter (β₂)',r.b2,r.b2>0?'↑ Increases':'↓ Decreases'],['X₃ - Time (β₃)',r.b3,r.b3>0?'↑ Increases':'↓ Decreases'],['X₁² (β₁₁)',r.b11,'Curvature'],['X₂² (β₂₂)',r.b22,'Curvature'],['X₁X₂ (β₁₂)',r.b12,'Interaction']];
+    html+=`<div class="card"><div class="card-title" style="color:${r.color};">${r.label} — Coefficients</div><table><thead style="background:#f0f0f0;"><tr><th>Term</th><th style="text-align:center;">Value</th><th>Effect</th></tr></thead><tbody>`;
+    terms.forEach(([t2,v,e])=>{const c=v>0?'#1a7a4a':v<0?'#c0392b':'#333';html+=`<tr><td style="font-family:monospace;">${t2}</td><td style="text-align:center;font-weight:700;color:${c};">${v>0?'+':''}${v}</td><td style="font-size:10px;color:#888;">${e}</td></tr>`;});
+    html+=`</tbody></table></div>`;
+  });
+  $('rsm-coeff-grid').innerHTML=html;
+}
+
+function rsmTab(name){
+  ['dashboard','surface','bbd','coeff'].forEach(n=>{
+    $(  `rsm-${n}`).style.display=n===name?'block':'none';
+    const btn=$(`rsm-tab-${n}`);
+    if(btn){btn.style.background=n===name?'#1a5276':'#fff';btn.style.color=n===name?'#fff':'#555';}
+  });
+  if(name==='surface'){
+    const m=parseFloat($('rsm-millet').value),s=parseFloat($('rsm-starter').value),t=parseFloat($('rsm-time').value);
+    const results={};Object.keys(RSM_RESP).forEach(k=>{results[k]=rsmCalc(k,m,s,t);});
+    setTimeout(()=>rsmDrawSurface(s,t,m,results),50);
+  }
+  if(name==='coeff') rsmDrawCoeff();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MASS BALANCE TOOL
+// ═══════════════════════════════════════════════════════════════
+const MASS_PARAMS=[
+  {id:'batch',label:'Batch Size',min:100,max:5000,step:100,val:1000,unit:' L',color:'#1a5276'},
+  {id:'millet',label:'Millet Level',min:0,max:15,step:0.5,val:9,unit:'%',color:'#148f77'},
+  {id:'starter',label:'Starter Culture',min:1,max:4,step:0.1,val:2.5,unit:'%',color:'#d35400'},
+  {id:'density',label:'Milk Density',min:1.025,max:1.045,step:0.001,val:1.032,unit:' kg/L',color:'#7d3c98'},
+  {id:'yogRec',label:'Yogurt Recovery',min:70,max:95,step:1,val:82,unit:'%',color:'#1a7a4a'},
+  {id:'wheyRec',label:'Whey Recovery',min:50,max:95,step:1,val:72,unit:'%',color:'#2471a3'},
+  {id:'wpcYield',label:'WPC Yield',min:5,max:20,step:0.5,val:8.5,unit:'%',color:'#ca6f1e'},
+  {id:'biogas',label:'Biogas Yield',min:0.20,max:0.50,step:0.01,val:0.34,unit:' m³/kg COD',color:'#d4ac0d'},
+  {id:'branFib',label:'Bran Fiber Content',min:15,max:40,step:1,val:28,unit:'%',color:'#7d3c98'},
+  {id:'yogPrice',label:'Yogurt Price',min:50,max:200,step:5,val:85,unit:' ₹/kg',color:'#1a7a4a'},
+  {id:'wpcPrice',label:'WPC Price',min:200,max:800,step:10,val:450,unit:' ₹/kg',color:'#1a5276'},
+  {id:'bgPrice',label:'Biogas Price',min:20,max:80,step:5,val:35,unit:' ₹/m³',color:'#d4ac0d'},
+];
+
+function massInit(){
+  let html='';
+  MASS_PARAMS.forEach(p=>{
+    html+=`<div style="background:#f8f9fa;border-radius:10px;padding:10px 14px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+        <span style="font-size:10px;font-weight:700;color:#555;">${p.label}</span>
+        <span style="font-size:11px;font-weight:800;color:${p.color};font-family:monospace;" id="mv-${p.id}">${p.val}${p.unit}</span>
+      </div>
+      <input type="range" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.val}" id="ms-${p.id}" oninput="massUpdate()" style="width:100%;accent-color:${p.color};cursor:pointer;">
+    </div>`;
+  });
+  $('mass-sliders').innerHTML=html;
+}
+
+function massGet(id){return parseFloat($('ms-'+id).value);}
+
+function massUpdate(){
+  MASS_PARAMS.forEach(p=>{$('mv-'+p.id).textContent=massGet(p.id)+p.unit;});
+  const batch=massGet('batch'),millet=massGet('millet'),starter=massGet('starter');
+  const density=massGet('density'),yogRec=massGet('yogRec'),wheyRec=massGet('wheyRec');
+  const wpcYield=massGet('wpcYield'),biogasY=massGet('biogas'),branFib=massGet('branFib');
+  const yogPrice=massGet('yogPrice'),wpcPrice=massGet('wpcPrice'),bgPrice=massGet('bgPrice');
+
+  const milkMass=batch*density,milletMass=batch*(millet/100),starterMass=batch*(starter/100);
+  const totalInput=milkMass+milletMass+starterMass;
+  const yogurtMass=milkMass*(yogRec/100)+milletMass*0.9;
+  const wheyTotal=milkMass*0.18;
+  const milletBran=milletMass*0.22;
+  const washWater=batch*0.08;
+  const packWaste=yogurtMass*0.003;
+  const totalByproductLinear=wheyTotal+milletBran+washWater*density+packWaste;
+  const wheyRecovered=wheyTotal*(wheyRec/100);
+  const wpcMass=wheyRecovered*(wpcYield/100);
+  const bioactivePep=wheyRecovered*0.004;
+  const wheyToBiogas=wheyTotal-wheyRecovered;
+  const cod=wheyToBiogas*0.065;
+  const biogasVol=cod*biogasY;
+  const fiberMass=milletBran*(branFib/100);
+  const milletFlour=milletBran*0.68;
+  const treatedWater=washWater*0.82;
+  const totalWaste=packWaste+(wheyTotal-wheyRecovered-wheyToBiogas)*0.01+milletBran*0.04;
+  const wasteRed=((totalByproductLinear-totalWaste)/totalByproductLinear)*100;
+  const yogRev=yogurtMass*yogPrice,wpcRev=wpcMass*wpcPrice,bgRev=biogasVol*bgPrice;
+  const fibRev=fiberMass*280,flourRev=milletFlour*120;
+  const totalRevCL=yogRev+wpcRev+bgRev+fibRev+flourRev;
+  const extraRev=wpcRev+bgRev+fibRev+flourRev;
+  const revInc=(extraRev/yogRev)*100;
+  const ghgLin=milkMass*3.2+milletMass*0.8;
+  const ghgSaved=biogasVol*2.1+wpcMass*0.6;
+  const ghgNet=ghgLin-ghgSaved;
+  const ghgRed=(ghgSaved/ghgLin)*100;
+  const energyMJ=biogasVol*10.4;
+
+  // KPIs
+  const kpis=[
+    {label:'Yogurt Produced',val:`${fmt(yogurtMass)} kg`,icon:'🥛',color:'#148f77'},
+    {label:'Total Revenue',val:`₹${Math.round(totalRevCL).toLocaleString('en-IN')}`,icon:'💰',color:'#1a7a4a'},
+    {label:'Waste Reduced',val:`${fmt(wasteRed)}%`,icon:'♻️',color:'#d35400'},
+    {label:'GHG Saved',val:`${fmt(ghgSaved)} kg CO₂`,icon:'🌱',color:'#1a5276'},
+  ];
+  $('mass-kpis').innerHTML=kpis.map(k=>`<div class="card kpi" style="color:${k.color};border-left-color:${k.color};"><div class="kpi-icon">${k.icon}</div><div class="kpi-val">${k.val}</div><div class="kpi-label">${k.label}</div></div>`).join('');
+
+  // Flow boxes
+  $('mass-flow-boxes').innerHTML=`
+    <div class="flow-box"><div class="flow-head" style="background:#1a5276;">📥 RAW INPUTS</div><div class="flow-body">
+      <div class="flow-row"><span class="flow-key">Camel Milk</span><span style="font-weight:700;color:#1a5276;">${fmt(milkMass)} kg</span></div>
+      <div class="flow-row"><span class="flow-key">Pearl Millet Flour</span><span style="font-weight:700;color:#1a5276;">${fmt(milletMass)} kg</span></div>
+      <div class="flow-row"><span class="flow-key">Starter Culture</span><span style="font-weight:700;color:#1a5276;">${fmt(starterMass)} kg</span></div>
+      <div class="flow-row"><span class="flow-key">Total Input</span><span style="font-weight:800;color:#1a5276;">${fmt(totalInput)} kg</span></div>
+    </div></div>
+    <div class="flow-box"><div class="flow-head" style="background:#ca6f1e;">♻️ BYPRODUCTS</div><div class="flow-body">
+      <div class="flow-row"><span class="flow-key">Camel Whey</span><span style="font-weight:700;color:#ca6f1e;">${fmt(wheyTotal)} kg</span></div>
+      <div class="flow-row"><span class="flow-key">Millet Bran</span><span style="font-weight:700;color:#ca6f1e;">${fmt(milletBran)} kg</span></div>
+      <div class="flow-row"><span class="flow-key">Wash Water</span><span style="font-weight:700;color:#ca6f1e;">${fmt(washWater)} L</span></div>
+      <div class="flow-row"><span class="flow-key">Yogurt Produced</span><span style="font-weight:800;color:#148f77;">${fmt(yogurtMass)} kg ✓</span></div>
+    </div></div>`;
+
+  // Valorization grid
+  const vals=[
+    {from:'Camel Whey',to:'WPC Powder',amt:`${fmt(wpcMass)} kg`,val:`₹${Math.round(wpcRev).toLocaleString('en-IN')}`,color:'#1a5276',icon:'🧪'},
+    {from:'Camel Whey',to:'Biogas/Biomethane',amt:`${fmt(biogasVol)} m³`,val:`₹${Math.round(bgRev).toLocaleString('en-IN')}`,color:'#d4ac0d',icon:'⚡'},
+    {from:'Camel Whey',to:'Bioactive Peptides',amt:`${fmt(bioactivePep*1000,1)} g`,val:'Premium Grade',color:'#7d3c98',icon:'💊'},
+    {from:'Millet Bran',to:'Prebiotic Fiber Conc.',amt:`${fmt(fiberMass)} kg`,val:`₹${Math.round(fibRev).toLocaleString('en-IN')}`,color:'#148f77',icon:'🌾'},
+    {from:'Millet Bran',to:'Phytate-reduced Flour',amt:`${fmt(milletFlour)} kg`,val:`₹${Math.round(flourRev).toLocaleString('en-IN')}`,color:'#2471a3',icon:'🍞'},
+    {from:'Wash Water',to:'Treated Irrigation Water',amt:`${fmt(treatedWater)} L`,val:'Eco-recovery',color:'#1a7a4a',icon:'💧'},
+  ];
+  $('mass-val-grid').innerHTML=vals.map(v=>`<div style="border-radius:12px;border:2px solid ${v.color};overflow:hidden;">
+    <div style="background:${v.color};padding:8px 14px;color:#fff;font-size:11px;font-weight:700;">${v.icon} From: ${v.from}</div>
+    <div style="padding:10px 14px;"><div style="font-weight:800;color:${v.color};font-size:12px;margin-bottom:4px;">${v.to}</div>
+    <div style="font-size:11px;">Quantity: <strong>${v.amt}</strong></div>
+    <div style="font-size:11px;color:#888;">Value: <strong style="color:#1a7a4a;">${v.val}</strong></div></div></div>`).join('');
+
+  $('mass-verify').innerHTML=`
+    <div style="background:#fff;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:#888;margin-bottom:4px;">Total Input</div><div style="font-size:18px;font-weight:900;col;color:#1a5276;">${fmt(totalInput)} kg</div></div>
+    <div style="background:#fff;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:#888;margin-bottom:4px;">Main Product</div><div style="font-size:18px;font-weight:900;color:#148f77;">${fmt(yogurtMass)} kg</div></div>
+    <div style="background:#fff;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:10px;color:#888;margin-bottom:4px;">Valorized Byproducts</div><div style="font-size:18px;font-weight:900;color:#ca6f1e;">${fmt(wpcMass+fiberMass+milletFlour+biogasVol*0.72)} kg</div></div>`;
+
+  // Table
+  $('mass-table-title').textContent=`📋 Detailed Mass Balance Table (per ${batch}L batch)`;
+  const streams=[
+    ['IN-01','Camel Milk (raw)',fmt(milkMass),'kg','Pasteurization → Fermentation','normal'],
+    ['IN-02','Pearl Millet Flour',fmt(milletMass),'kg','Pre-treated → Added to milk','normal'],
+    ['IN-03','Starter Culture (LAB)',fmt(starterMass),'kg','Inoculated into milk blend','normal'],
+    ['OUT-01','Camel Milk Yogurt',fmt(yogurtMass),'kg','Main product → Packaging','out'],
+    ['BP-01','Camel Whey Permeate',fmt(wheyTotal),'kg','→ Ultrafiltration/Valorization','bp'],
+    ['VAL-01','WPC Powder (WPC70)',fmt(wpcMass),'kg','→ Sports nutrition/bakery','val'],
+    ['VAL-02','Biogas (CH₄)',fmt(biogasVol),'m³','→ Energy recovery/boiler','val'],
+    ['BP-02','Pearl Millet Bran',fmt(milletBran),'kg','→ Fiber extraction','bp'],
+    ['VAL-03','Prebiotic Fiber Conc.',fmt(fiberMass),'kg','→ Functional food ingredient','val'],
+    ['VAL-04','Phytate-reduced Flour',fmt(milletFlour),'kg','→ Baking/feed industry','val'],
+    ['BP-03','Wash Water Effluent',fmt(washWater),'L','→ Wetland treatment','bp'],
+    ['VAL-05','Treated Irrigation Water',fmt(treatedWater),'L','→ Agricultural reuse','val'],
+    ['WASTE','Final Unrecovered Waste',fmt(totalWaste),'kg','Landfill/composting','waste'],
+  ];
+  const bgMap={normal:'',out:'#d6eaf8',bp:'#fef9f0',val:'#d5f5e3',waste:'#fde8e8'};
+  const cMap={normal:'#333',out:'#1a5276',bp:'#ca6f1e',val:'#1a7a4a',waste:'#c0392b'};
+  $('mass-table-body').innerHTML=streams.map(([id,desc,qty,unit,fate,type])=>`
+    <tr style="background:${bgMap[type]};">
+      <td style="font-family:monospace;font-weight:700;color:#888;">${id}</td>
+      <td>${desc}</td>
+      <td style="font-weight:800;color:${cMap[type]};">${qty}</td>
+      <td style="color:#888;">${unit}</td>
+      <td style="font-size:10px;color:#666;">${fate}</td>
+    </tr>`).join('');
+
+  // Economics chart
+  if($('mass-econ').style.display!=='none'){
+    destroyChart('mass-revenue-chart');
+    const ctx=$('mass-revenue-chart').getContext('2d');
+    chartInstances['mass-revenue-chart']=new Chart(ctx,{type:'bar',data:{
+      labels:['Yogurt','WPC','Biogas','Fiber Conc.','Millet Flour'],
+      datasets:[
+        {label:'Linear System',data:[Math.round(yogRev),0,0,0,0],backgroundColor:'#e74c3c',borderRadius:6},
+        {label:'Closed-Loop',data:[Math.round(yogRev),Math.round(wpcRev),Math.round(bgRev),Math.round(fibRev),Math.round(flourRev)],backgroundColor:'#148f77',borderRadius:6},
+      ]
+    },options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{ticks:{callback:v=>'₹'+Math.round(v/1000)+'k'}}}}});
+    $('mass-econ-detail').innerHTML=`<div class="card-title" style="color:#1a5276;">💰 Economic Summary (per ${batch}L batch)</div>`+
+      [['Yogurt Revenue',yogRev,'#148f77'],['WPC Revenue',wpcRev,'#1a5276'],['Biogas Revenue',bgRev,'#d4ac0d'],['Fiber Revenue',fibRev,'#7d3c98'],['Millet Flour Revenue',flourRev,'#2471a3']].map(([l,v,c])=>`
+      <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed #eee;">
+        <span style="font-size:12px;color:#555;">${l}</span>
+        <span style="font-weight:800;color:${c};">₹${Math.round(v).toLocaleString('en-IN')}</span>
+      </div>`).join('')+
+      `<div style="margin-top:10px;background:#d5f5e3;border-radius:10px;padding:12px;display:flex;justify-content:space-between;">
+        <span style="font-weight:800;color:#1a7a4a;">TOTAL CLOSED-LOOP REVENUE</span>
+        <span style="font-weight:900;font-size:15px;color:#1a7a4a;">₹${Math.round(totalRevCL).toLocaleString('en-IN')}</span>
+      </div>
+      <div style="margin-top:8px;background:#1a5276;border-radius:10px;padding:10px;display:flex;justify-content:space-between;">
+        <span style="color:#fff;font-size:12px;">Extra Revenue vs Linear</span>
+        <span style="color:#d4ac0d;font-weight:900;">+₹${Math.round(extraRev).toLocaleString('en-IN')} (+${fmt(revInc)}%)</span>
+      </div>`;
+  }
+
+  // Sustainability
+  if($('mass-sus').style.display!=='none'){
+    $('mass-sus-kpis').innerHTML=[
+      {title:'Waste Reduction',val:`${fmt(wasteRed)}%`,desc:`${fmt(totalByproductLinear)}kg → ${fmt(totalWaste)}kg`,color:'#148f77',icon:'♻️'},
+      {title:'GHG Reduction',val:`${fmt(ghgRed)}%`,desc:`Saved ${fmt(ghgSaved)} kg CO₂-eq`,color:'#1a5276',icon:'🌱'},
+      {title:'Water Recovered',val:`${fmt(treatedWater)} L`,desc:`${fmt((treatedWater/washWater)*100)}% of wash water reused`,color:'#2471a3',icon:'💧'},
+      {title:'Energy from Biogas',val:`${fmt(energyMJ)} MJ`,desc:`${fmt(biogasVol)} m³ CH₄ at 10.4 MJ/m³`,color:'#d35400',icon:'⚡'},
+    ].map(k=>`<div class="card" style="border-top:4px solid ${k.color};">
+      <div style="font-size:26px;">${k.icon}</div>
+      <div style="font-size:12px;font-weight:700;color:#888;margin-top:8px;">${k.title}</div>
+      <div style="font-size:30px;font-weight:900;color:${k.color};">${k.val}</div>
+      <div style="font-size:10px;color:#aaa;margin-top:4px;">${k.desc}</div>
+    </div>`).join('');
+    destroyChart('mass-sus-chart');
+    const ctx2=$('mass-sus-chart').getContext('2d');
+    chartInstances['mass-sus-chart']=new Chart(ctx2,{type:'bar',data:{
+      labels:['GHG (kg CO₂-eq)','Waste (kg)','Water Loss (L)'],
+      datasets:[
+        {label:'Linear System',data:[+fmt(ghgLin),+fmt(totalByproductLinear),+fmt(washWater)],backgroundColor:'#e74c3c',borderRadius:6},
+        {label:'Closed-Loop',data:[+fmt(ghgNet),+fmt(totalWaste),+fmt(washWater-treatedWater)],backgroundColor:'#148f77',borderRadius:6},
+      ]
+    },options:{responsive:true,indexAxis:'y',plugins:{legend:{position:'bottom'}}}});
+  }
+}
+
+function massTab(name){
+  ['flow','table','econ','sus'].forEach(n=>{
+    $('mass-'+n).style.display=n===name?'block':'none';
+    const btn=$('mass-tab-'+n);
+    if(btn){btn.style.background=n===name?'#1a5276':'#fff';btn.style.color=n===name?'#fff':'#555';}
+  });
+  massUpdate();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHELF LIFE TOOL
+// ═══════════════════════════════════════════════════════════════
+const R_GAS=8.314;
+const SHELF_RESP={
+  ph:{label:'pH Drop',color:'#1a7a4a',Q0:4.52,fail:4.0,failLabel:'pH < 4.0',increasing:false,Ea:52400,lnA:18.2},
+  acidity:{label:'Acidity Rise (%LA)',color:'#c0392b',Q0:0.82,fail:1.4,failLabel:'Acidity > 1.4%',increasing:true,Ea:61200,lnA:21.4},
+  sensory:{label:'Sensory Score (/9)',color:'#d35400',Q0:7.9,fail:6.0,failLabel:'Score < 6.0',increasing:false,Ea:48800,lnA:16.8},
+  syneresis:{label:'Syneresis (%)',color:'#2471a3',Q0:22.0,fail:45.0,failLabel:'Syneresis > 45%',increasing:true,Ea:44500,lnA:15.9},
+};
+const SHELF_TEMPS=[4,10,25,37];
+const SHELF_TCOLORS=['#1a5276','#148f77','#d35400','#c0392b'];
+let shelfActiveResp='ph';
+
+function shelfInit(){
+  // Temperature sliders
+  const tempCfgs=[
+    {id:'t0',label:'Refrigeration',min:0,max:8,val:4,color:'#1a5276'},
+    {id:'t1',label:'Cold Chain',min:8,max:15,val:10,color:'#148f77'},
+    {id:'t2',label:'Room Temp',min:20,max:30,val:25,color:'#d35400'},
+    {id:'t3',label:'Abuse Temp',min:30,max:45,val:37,color:'#c0392b'},
+  ];
+  $('shelf-temp-sliders').innerHTML=tempCfgs.map(p=>`
+    <div class="slider-row">
+      <div class="slider-header">
+        <span class="slider-label">${p.label}</span>
+        <span class="slider-val" id="stv-${p.id}" style="color:${p.color};border-color:${p.color};">${p.val}°C</span>
+      </div>
+      <input type="range" min="${p.min}" max="${p.max}" step="1" value="${p.val}" id="st-${p.id}" oninput="shelfUpdate()" style="accent-color:${p.color};">
+      <div class="slider-minmax"><span>${p.min}°C</span><span>${p.max}°C</span></div>
+    </div>`).join('');
+
+  // Ea sliders
+  const eaCfgs=[
+    {id:'ea-ph',label:'Eₐ — pH Drop',min:30000,max:90000,step:500,val:52400,color:'#1a7a4a'},
+    {id:'ea-acid',label:'Eₐ — Acidity Rise',min:40000,max:100000,step:500,val:61200,color:'#c0392b'},
+    {id:'ea-sens',label:'Eₐ — Sensory Loss',min:30000,max:80000,step:500,val:48800,color:'#d35400'},
+    {id:'ea-syne',label:'Eₐ — Syneresis',min:25000,max:70000,step:500,val:44500,color:'#2471a3'},
+  ];
+  $('shelf-ea-sliders').innerHTML=eaCfgs.map(p=>`
+    <div class="slider-row">
+      <div class="slider-header">
+        <span class="slider-label">${p.label}</span>
+        <span class="slider-val" id="stv-${p.id}" style="color:${p.color};border-color:${p.color};">${(p.val/1000).toFixed(1)} kJ</span>
+      </div>
+      <input type="range" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.val}" id="st-${p.id}" oninput="shelfUpdate()" style="accent-color:${p.color};">
+      <div class="slider-minmax"><span>${p.min/1000}kJ</span><span>${p.max/1000}kJ</span></div>
+    </div>`).join('');
+
+  // Response buttons
+  $('shelf-resp-btns').innerHTML=Object.entries(SHELF_RESP).map(([k,r])=>`
+    <button onclick="shelfSetResp('${k}')" id="srb-${k}" style="padding:8px 16px;border-radius:25px;border:2px solid ${r.color};cursor:pointer;font-weight:700;font-size:11px;background:${k==='ph'?r.color:'#fff'};color:${k==='ph'?'#fff':r.color};">
+      ${r.label}
+    </button>`).join('');
+}
+
+function shelfSetResp(key){
+  shelfActiveResp=key;
+  Object.entries(SHELF_RESP).forEach(([k,r])=>{
+    const btn=$('srb-'+k);
+    btn.style.background=k===key?r.color:'#fff';
+    btn.style.color=k===key?'#fff':r.color;
+  });
+  shelfUpdate();
+}
+
+function shelfGetTemps(){
+  return [0,1,2,3].map(i=>parseFloat($('st-t'+i).value));
+}
+
+function shelfGetEa(resp){
+  const map={ph:'ea-ph',acidity:'ea-acid',sensory:'ea-sens',syneresis:'ea-syne'};
+  return parseFloat($('st-'+map[resp]).value);
+}
+
+function shelfCalcK(resp,tempC){
+  const Ea=shelfGetEa(resp);
+  const lnA=SHELF_RESP[resp].lnA;
+  return Math.exp(lnA-Ea/(R_GAS*(tempC+273.15)));
+}
+
+function shelfCalcSL(resp,tempC,milletFactor=1.0){
+  const r=SHELF_RESP[resp];
+  const k=shelfCalcK(resp,tempC)/milletFactor;
+  const range=Math.abs(r.fail-r.Q0);
+  return -Math.log(1-0.98)/k;
+}
+
+function shelfUpdate(){
+  // Update labels
+  [0,1,2,3].forEach(i=>{const v=$('st-t'+i).value;$('stv-t'+i).textContent=v+'°C';});
+  ['ea-ph','ea-acid','ea-sens','ea-syne'].forEach(id=>{const v=parseFloat($('st-'+id).value);$('stv-'+id).textContent=(v/1000).toFixed(1)+' kJ';});
+  const milletFactor=parseFloat($('shelf-millet').value);
+  $('shelf-millet-val').textContent=milletFactor.toFixed(2)+'×';
+  $('shelf-millet-desc').textContent=`Pearl millet extends shelf life by ${((milletFactor-1)*100).toFixed(0)}% compared to plain yogurt`;
+  $('shelf-table-factor').textContent=milletFactor.toFixed(2);
+
+  const temps=shelfGetTemps();
+  const resp=shelfActiveResp;
+  const r=SHELF_RESP[resp];
+
+  // Update tab label
+  $('shelf-deg-title').textContent=`${r.label} — Quality Degradation Over Time`;
+  $('shelf-deg-criterion').textContent=`Failure criterion: ${r.failLabel}`;
+  $('shelf-arr-title').textContent=`Arrhenius Plot — ${r.label}`;
+  $('shelf-arr-eq').innerHTML=`Arrhenius: k = A·exp(−Eₐ/RT) → ln(k) = ln(A) − Eₐ/(R·T)<br>Eₐ = ${shelfGetEa(resp).toLocaleString()} J/mol = ${(shelfGetEa(resp)/1000).toFixed(2)} kJ/mol`;
+
+  // Degradation curves
+  if($('shelf-deg').style.display!=='none'){
+    const days=Array.from({length:46},(_,i)=>i);
+    const datasets=[];
+    temps.forEach((t,i)=>{
+      const k=shelfCalcK(resp,t);
+      const kM=k/milletFactor;
+      const dPlain=days.map(d=>{
+        if(r.increasing)return +(r.Q0+(r.fail-r.Q0)*(1-Math.exp(-k*d))).toFixed(3);
+        return +(r.Q0-(r.Q0-r.fail)*(1-Math.exp(-k*d))).toFixed(3);
+      });
+      const dMillet=days.map(d=>{
+        if(r.increasing)return +(r.Q0+(r.fail-r.Q0)*(1-Math.exp(-kM*d))).toFixed(3);
+        return +(r.Q0-(r.Q0-r.fail)*(1-Math.exp(-kM*d))).toFixed(3);
+      });
+      datasets.push({label:`${t}°C (plain)`,data:dPlain,borderColor:SHELF_TCOLORS[i],borderWidth:2,fill:false,tension:0.4,pointRadius:0});
+      datasets.push({label:`${t}°C (+millet)`,data:dMillet,borderColor:SHELF_TCOLORS[i],borderWidth:2,borderDash:[6,2],fill:false,tension:0.4,pointRadius:0});
+    });
+    destroyChart('shelf-deg-chart');
+    chartInstances['shelf-deg-chart']=new Chart($('shelf-deg-chart').getContext('2d'),{
+      type:'line',
+      data:{labels:days,datasets},
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:10}}},annotation:{annotations:{line1:{type:'line',yMin:r.fail,yMax:r.fail,borderColor:'red',borderWidth:1.5,borderDash:[6,3]}}}},scales:{x:{title:{display:true,text:'Storage Time (days)'}},y:{title:{display:true,text:r.label}}}}
+    });
+
+    // Shelf life cards
+    $('shelf-deg-cards').innerHTML=temps.map((t,i)=>{
+      const sl=shelfCalcSL(resp,t);
+      const slM=shelfCalcSL(resp,t,milletFactor);
+      return `<div style="background:${SHELF_TCOLORS[i]}12;border-radius:10px;padding:10px;border:1.5px solid ${SHELF_TCOLORS[i]};">
+        <div style="font-size:10px;font-weight:700;color:${SHELF_TCOLORS[i]};">${t}°C</div>
+        <div style="font-size:16px;font-weight:900;color:${SHELF_TCOLORS[i]};">${sl.toFixed(1)}<span style="font-size:9px;"> days</span></div>
+        <div style="font-size:9px;color:#aaa;">plain yogurt</div>
+        <div style="font-size:13px;font-weight:800;color:#148f77;margin-top:4px;">${slM.toFixed(1)}<span style="font-size:9px;"> days</span></div>
+        <div style="font-size:9px;color:#148f77;">+pearl millet</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Shelf life table
+  if($('shelf-table').style.display!=='none'){
+    let thead=`<thead style="background:#2c3e50;color:#fff;"><tr><th>Parameter</th><th>Criterion</th>`;
+    temps.forEach(t=>{thead+=`<th style="text-align:center;" colspan="2">${t}°C</th>`;});
+    thead+=`</tr><tr style="background:#34495e;color:#ccc;font-size:9px;"><th></th><th></th>`;
+    temps.forEach(()=>{thead+=`<th style="text-align:center;">Plain (d)</th><th style="text-align:center;color:#2ecc71;">+Millet (d)</th>`;});
+    thead+=`</tr></thead>`;
+    let tbody='<tbody>';
+    Object.entries(SHELF_RESP).forEach(([k,rr],ri)=>{
+      tbody+=`<tr style="background:${ri%2===0?'#fafafa':'#fff'};">`;
+      tbody+=`<td style="font-weight:700;color:${rr.color};">${rr.label}</td><td style="font-size:10px;color:#888;">${rr.failLabel}</td>`;
+      temps.forEach(t=>{
+        const sl=shelfCalcSL(k,t);
+        const slM=shelfCalcSL(k,t,milletFactor);
+        tbody+=`<td style="text-align:center;font-weight:700;">${sl.toFixed(1)}</td><td style="text-align:center;font-weight:800;color:#148f77;background:#f0faf4;">${slM.toFixed(1)}</td>`;
+      });
+      tbody+='</tr>';
+    });
+    tbody+='</tbody>';
+    $('shelf-sl-table').innerHTML=thead+tbody;
+    const sl0=shelfCalcSL('ph',temps[0]);
+    const slM0=shelfCalcSL('ph',temps[0],milletFactor);
+    $('shelf-finding').innerHTML=`<strong>★ Key Finding:</strong> Pearl millet enrichment (9% w/v) extends predicted shelf life by ${((milletFactor-1)*100).toFixed(0)}% at all storage temperatures. At ${temps[0]}°C refrigeration, shelf life extends from ${sl0.toFixed(1)} to ${slM0.toFixed(1)} days — attributed to antimicrobial ferulic acid and lower pH environment.`;
+  }
+
+  // Arrhenius
+  if($('shelf-arr').style.display!=='none'){
+    const arrData=temps.map(t=>({x:+(1000/(t+273.15)).toFixed(4),y:+Math.log(shelfCalcK(resp,t)).toFixed(4),label:`${t}°C`}));
+    destroyChart('shelf-arr-chart');
+    chartInstances['shelf-arr-chart']=new Chart($('shelf-arr-chart').getContext('2d'),{
+      type:'line',
+      data:{datasets:[{label:'ln(k)',data:arrData.map(d=>({x:d.x,y:d.y})),borderColor:r.color,backgroundColor:r.color,borderWidth:3,pointRadius:8,pointStyle:'circle'}]},
+      options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{type:'linear',title:{display:true,text:'1000/T (K⁻¹)'},ticks:{callback:v=>v.toFixed(3)}},y:{title:{display:true,text:'ln(k)'}}}}
+    });
+    $('shelf-arr-cards').innerHTML=temps.map((t,i)=>{
+      const k=shelfCalcK(resp,t);
+      return `<div class="stat-box"><div style="font-size:10px;color:#888;">${t}°C</div><div style="font-family:monospace;font-size:12px;font-weight:800;color:${SHELF_TCOLORS[i]};">k=${k.toExponential(2)}</div><div style="font-size:9px;color:#aaa;">ln(k)=${Math.log(k).toFixed(3)}</div></div>`;
+    }).join('');
+  }
+
+  // Kinetic parameters
+  if($('shelf-kin').style.display!=='none'){
+    $('shelf-kin-grid').innerHTML=Object.entries(SHELF_RESP).map(([k,rr])=>`
+      <div class="card"><div class="card-title" style="color:${rr.color};">${rr.label}</div>
+      <table><thead style="background:#f0f0f0;"><tr><th>Parameter</th><th style="text-align:center;">Value</th></tr></thead><tbody>
+        ${[['Initial Q₀',rr.Q0],['Failure threshold',rr.fail],['Eₐ',`${(shelfGetEa(k)/1000).toFixed(1)} kJ/mol`],['ln(A)',rr.lnA],
+          ...temps.map((t,i)=>[`k at ${t}°C`,shelfCalcK(k,t).toExponential(3)]),
+          ...temps.map((t,i)=>[`Shelf life @${t}°C`,shelfCalcSL(k,t).toFixed(1)+' d']),
+          ...temps.map((t,i)=>[`+Millet @${t}°C`,shelfCalcSL(k,t,milletFactor).toFixed(1)+' d']),
+        ].map(([p2,v],j)=>`<tr style="background:${j%2===0?'#fafafa':'#fff'};"><td style="color:#666;">${p2}</td><td style="text-align:center;font-weight:700;color:${rr.color};font-family:monospace;">${v}</td></tr>`).join('')}
+      </tbody></table></div>`).join('');
+  }
+}
+
+function shelfTab(name){
+  ['deg','table','arr','kin'].forEach(n=>{
+    $('shelf-'+n).style.display=n===name?'block':'none';
+    const btn=$('shelf-tab-'+n);
+    if(btn){btn.style.background=n===name?'#2c3e50':'#fff';btn.style.color=n===name?'#fff':'#555';}
+  });
+  shelfUpdate();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  rsmUpdate();
+  massInit();
+  massUpdate();
+  shelfInit();
+  shelfUpdate();
+});
+</script>
+</body>
+</html>
